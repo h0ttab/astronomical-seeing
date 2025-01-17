@@ -1,4 +1,4 @@
-from modules.utils import merge_dicts
+from modules.utils import merge_dicts, log
 from modules.config_loader import FORECAST_DAYS, API_KEY, TIMEZONE, LATITUDE, LONGITUDE
 
 import requests
@@ -38,6 +38,8 @@ def fetch(endpoint: str, add_params: dict = {}) -> dict:
 
     url = API_BASE_URL + endpoint.lstrip(" /")
     params = merge_dicts(add_params, REQUEST_COMMON_PARAMS)
+    log(event_type="INFO", message=f"Отправка GET запроса на адрес {url}", data=f"Параметры запроса:\n{params}")
     data = requests.get(url, params).json()
+    log(event_type="INFO", message="Получен ответ от API.", data=data)
 
     return data

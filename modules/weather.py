@@ -2,8 +2,8 @@ import math
 
 from datetime import time
 from modules import api
-from modules.utils import str_to_date
-from modules.config_loader import TIME_FILTER, CLOUDINESS_FILTER
+from modules.utils import str_to_date, timezone_correction, log
+from modules.config_loader import TIME_FILTER, CLOUDINESS_FILTER, TIMEZONE_CORRECTION_AMOUNT
 
 def moon_illumination(illumination_midday: list[float], phase_name: list[str]) -> list:
     """
@@ -221,6 +221,8 @@ def process_weather_data(clouds_data: dict, moon_data: dict) -> dict:
     # после последего запрошенного дня. Для этой даты не запрашиваются данные о
     # Луне и Солнце, в следствие чего этот элемент словаря не нужен.
     clouds_data.popitem()
+    
+    log(event_type="INFO", message="Данные обработаны.", data=clouds_data)
 
     return clouds_data
 

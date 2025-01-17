@@ -1,5 +1,7 @@
+import uuid
+
 from datetime import datetime, timedelta
-from modules.config_loader import CLOUDINESS_FILTER
+from modules.config_loader import CLOUDINESS_FILTER, LOGS_PATH
 
 today_date = str(datetime.now().date())
 
@@ -28,6 +30,65 @@ def merge_dicts(*dicts: dict) -> dict:
     merge_result = dict(merge_result)
 
     return merge_result
+
+def log(event_type: str, message: str, data: any = None) -> None:
+    """
+    Записывает данные в лог-файл с указанием типа события и сообщения.
+
+    Эта функция записывает переданные данные в лог-файл, добавляя информацию о типе события, 
+    описание события и саму информацию, а так же уникальный ID записи. Запись будет содержать текущую дату и время, тип события,
+    сообщение и переданные данные. Если данные не переданы, то эта часть будет пропущена. 
+    После записи выводится сообщение о количестве добавленных записей.
+
+    Args:
+        event_type (str): Тип события, который будет добавлен в лог (например, "INFO", "ERROR", "WARNING").
+        message (str): Описание события, которое будет прикреплено к данным.
+        data (any, optional): Данные любого типа, которые будут записаны в лог. 
+            Если данные не переданы, эта часть будет пропущена.
+
+    Returns:
+        None
+
+    Example:
+        >>> log(event_type="INFO", message="Process started", data={"key": "value"})
+        Запись в лог-файл с типом события "INFO" и сообщением "Process started" будет добавлена.
+    """
+    
+    #Открываем лог-файл в режиме добавления новых данных
+    with open(f"{LOGS_PATH + today_date}.log", "a", encoding="utf-8") as file:
+        
+        file.write(f"Timestamp: {datetime.now()}\n")
+        file.write(f"Record UID: {str(uuid.uuid4())}\n")
+        file.write(f"Event type: {event_type}\n")
+        file.write(f"Message: {message}\n")
+        if data:
+            file.write(f"Data:\n{data}\n")
+        file.write("\n")
+
+def log_flush() -> None:
+    """
+    Очищает лог-файл. 
+    
+    Очищает лог, выводит в консоль сообщение о том, что лог очищен.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+
+    Example:
+        >>> log_flush()
+        "Log file has been cleared"
+
+    """
+    # Открываем лог-файл в режиме перезаписи и записываем туда пустую строку,
+    # полностью стирая всё предыдущее содержимое
+    log = open(f"{LOGS_PATH + today_date}.log", "w", encoding="utf-8")
+    log.write("")
+    log.close()
+
+    print("Log file has been cleared")
 
 def str_to_date(timestamps: list[str], timestamp_format:str) -> list[datetime]:
     """
@@ -130,9 +191,11 @@ def compose_report(weather_data: dict) -> dict:
             output_str += day_report
 
     if total_days == 0:
+        log(event_type="WARNING", message="Отчёт не сформирован. Недостаточно данных", data=output_str)
         result_status = "error"
         result_message = "No data matching the specified criteria was found."
     else:
+        log(event_type="INFO", message="Сформирован отчёт", data=output_str)
         result_status = "success"
         result_message = output_str
 
