@@ -199,14 +199,14 @@ def process_weather_data(clouds_data: dict, moon_data: dict) -> dict:
 
     # Названия фаз Луны с переводом
     moon_phase_translation = {
-        "new": "Новолуние",
-        "waxing crescent": "Растущая",
-        "first quarter": "Растущая",
-        "waxing gibbous": "Растущая",
-        "full": "Полнолуние",
-        "waning gibbous": "Убывающая",
-        "last quarter": "Убывающая",
-        "waning crescent": "Убывающая"
+        "new": "Новолуние - \U0001F311",
+        "waxing crescent": "Растущий месяц - \U0001F312",
+        "first quarter": "Первая четверть - \U0001F313",
+        "waxing gibbous": "Растущая Луна - \U0001F314",
+        "full": "Полнолуние - \U0001F315",
+        "waning gibbous": "Убывающая Луна - \U0001F316",
+        "last quarter": "Последняя четверть - \U0001F317",
+        "waning crescent": "Убывающий месяц - \U0001F318"
     }
 
     clouds_data = split_cloudiness_by_days(clouds_data)

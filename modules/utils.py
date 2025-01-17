@@ -171,11 +171,11 @@ def compose_report(weather_data: dict) -> dict:
         else:
             total_days += 1
             day_report = f"""
-    Дата: {day.strftime("%d.%m.%Y")}
-    Заход Солнца: {str(weather_data[day]["sunset"].strftime('%H:%M'))}
-    Освещённость Луны ночью: {weather_data[day]["moon_illumination"]}%
-    Фаза Луны: {weather_data[day]["moon_phase"]}
-    Время с облачностью не более {CLOUDINESS_FILTER}%:
+    \U0001F4C5 Дата: {day.strftime("%d.%m.%Y")}
+    \U0001F307 Закат: {str(weather_data[day]["sunset"].strftime('%H:%M'))}
+    \U0001F313 Освещённость Луны: {weather_data[day]["moon_illumination"]}%
+    \U0001F319 Фаза Луны: {weather_data[day]["moon_phase"]}
+    \U00002601 Время с облачностью не более {CLOUDINESS_FILTER}%:
     """
 
             cloudiness_data = weather_data[day]["date_time"]
@@ -184,7 +184,7 @@ def compose_report(weather_data: dict) -> dict:
             # (см.) валидацию day == datetime.now().date() and hour <= datetime.now().time()
             is_today_data_present = False
             for hour in cloudiness_data:
-                cloudiness = f"""   {hour.strftime('%H:%M')} - {cloudiness_data[hour]}%
+                cloudiness = f"""        {hour.strftime('%H:%M')} - {cloudiness_data[hour]}%
     """
                 # Если день сегодняшний, и время меньше текущего (т.е. уже прошло), то не добавляем это в отчёт
                 if day == datetime.now().date() and hour <= datetime.now().time():
