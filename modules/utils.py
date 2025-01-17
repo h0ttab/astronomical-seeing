@@ -179,7 +179,10 @@ def compose_report(weather_data: dict) -> dict:
     """
 
             cloudiness_data = weather_data[day]["date_time"]
-
+            # Переменная is_today_data_present нужна для того, чтобы в отчёт не попал "пустой" сегодняшний день, если данные для него на самом деле есть, но все они уже устарели 
+            # относительно текущего времени и были удалены из финального текста отчёта. 
+            # (см.) валидацию day == datetime.now().date() and hour <= datetime.now().time()
+            is_today_data_present = False
             for hour in cloudiness_data:
                 cloudiness = f"""   {hour.strftime('%H:%M')} - {cloudiness_data[hour]}%
     """
@@ -188,7 +191,11 @@ def compose_report(weather_data: dict) -> dict:
                     pass
                 else:
                     day_report += cloudiness
-            output_str += day_report
+                    is_today_data_present = True
+            if is_today_data_present:
+                output_str += day_report
+            else:
+                day_report = ""
 
     if total_days == 0:
         log(event_type="WARNING", message="Отчёт не сформирован. Недостаточно данных", data=output_str)
