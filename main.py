@@ -1,5 +1,5 @@
 from modules.weather import get_clouds_data, get_sun_moon_data, process_weather_data
-from modules.utils import compose_report
+from modules.report import compose_report
 from modules.config_loader import BOT_TOKEN, CHAT_ID
 import requests
 

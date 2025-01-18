@@ -242,30 +242,44 @@ def get_clouds_data() -> dict:
     >>> get_clouds_data()
         {'date_time': [datetime.datetime(2025, 1, 9, 0, 0), datetime.datetime(2025, 1, 9, 1, 0)], 'cloudiness': [65, 32]}
     """
-    def outdated_data_filter(timestamp: list[datetime])->list[datetime]:
+    def outdated_data_filter(date_time: list[datetime], cloudiness: list[int]) -> list:
         """
-        Фильтрует данные типа datetime, отбрасывая устаревшие данные
+        Фильтрует данные время/облачность, убирая устаревшие данные
 
+        Убирает данные за время, которое уже прошло, относительно момента составления отчёта.
+        Происходит параллельная итерация по обоим входным спискам, и если обнаруживается временная метка,
+        которая равна или больше текущего момента времени - временная метка переносится в результирующий "очищенный" список,
+        а соответствующий показатель облачности для этой метки переносится в аналогичный результирующий список для облачности.
+
+        Args:
+            date_time (list[datetime]): Список временных меток
+            cloudiness (list[int]): Список показателей облачности в процентах
+        
         Returns:
-            list: Список из данных datetime, в котором все элементы равны или позднее текущего времени
+            list: Два списка с отфильтрованными значениями времени и облачности. 
         """
-        filtered_data = []
-        for element in timestamp:
-            if element.date() == datetime.now().date() and element.time() <= datetime.now().time():
+        filtered_date_time = []
+        filtered_cloudiness = []
+
+        for dt, cl in zip(date_time, cloudiness):
+            if dt.date() == datetime.now().date() and dt.time() <= datetime.now().time():
                 pass
             else:
-                filtered_data.append(element)
-        return filtered_data
+                filtered_date_time.append(dt)
+                filtered_cloudiness.append(cl)
+        return filtered_date_time, filtered_cloudiness
 
     data = api.fetch("/clouds-1h", {"windspeed":"kmh", "temperature":"C"})["data_1h"]
     timestamp = data["time"]
-    cloudiness = data["totalcloudcover"]
-    
+
     date_time = str_to_date(timestamp, "%Y-%m-%d %H:%M")
-    filtered_date_time = outdated_data_filter(date_time)
+    cloudiness = data["totalcloudcover"]
+
+    filtered_date_time, filtered_cloudiness = outdated_data_filter(date_time, cloudiness)
+
     return {
         "date_time": filtered_date_time,
-        "cloudiness": cloudiness,
+        "cloudiness": filtered_cloudiness,
         }
 
 def get_sun_moon_data() -> dict:

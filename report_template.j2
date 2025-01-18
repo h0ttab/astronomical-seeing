@@ -1,0 +1,13 @@
+Прогноз астрономической видимости.
+Дата и время составления отчёта: {{ current_time }}
+
+{% for day in weather_data.keys() -%}
+Дата: {{day.strftime("%d.%m.%Y")}}
+Закат: {{weather_data[day]["sunset"].strftime('%H:%M')}}
+Освещённость Луны: {{weather_data[day]["moon_illumination"]}}%
+Фаза Луны: {{weather_data[day]["moon_phase"]}}
+Время с облачностью не более {{CLOUDINESS_FILTER}}%:
+    {% for hour in weather_data[day]["date_time"] -%}
+        {{hour.strftime('%H:%M')}} - {{weather_data[day]["date_time"][hour]}}%
+    {% endfor %}
+{% endfor %}
