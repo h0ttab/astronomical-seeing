@@ -221,7 +221,15 @@ def process_weather_data(clouds_data: dict, moon_data: dict) -> dict:
     # после последего запрошенного дня. Для этой даты не запрашиваются данные о
     # Луне и Солнце, в следствие чего этот элемент словаря не нужен.
     clouds_data.popitem()
-    
+
+    # Удалим все дни с пустой информацией об облачности (которая была отброшена фильтром)
+    # Конструкция list(dict.keys()) итерируется по копии ключей словаря,
+    # позволяя изменять словарь, не получая ошибку об изменении длины словаря
+    # во время итерации.
+    for day in list(clouds_data.keys()):
+        if not clouds_data[day]["date_time"]:
+            clouds_data.pop(day)
+
     log(event_type="INFO", message="Данные обработаны.", data=clouds_data)
 
     return clouds_data
