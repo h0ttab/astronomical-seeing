@@ -164,7 +164,6 @@ def compose_report(weather_data: dict) -> dict:
 Дата и время составления отчёта: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
     """
     total_days = 0
-    is_today_data_present = False
 
     for day in weather_data.keys():
         if not weather_data[day]["date_time"]:
@@ -186,18 +185,11 @@ def compose_report(weather_data: dict) -> dict:
             for hour in cloudiness_data:
                 cloudiness = f"""        {hour.strftime('%H:%M')} - {cloudiness_data[hour]}%
     """
-                # Если день сегодняшний, и время меньше текущего (т.е. уже прошло), то не добавляем это в отчёт
-                if day == datetime.now().date() and hour <= datetime.now().time():
-                    pass
-                else:
-                    day_report += cloudiness
-                    is_today_data_present = True
-            if is_today_data_present:
-                output_str += day_report
-            else:
-                day_report = ""
+                day_report += cloudiness
+      
+            output_str += day_report
 
-    if total_days == 0 or (total_days == 1 and is_today_data_present == False):
+    if total_days == 0:
         log(event_type="WARNING", message="Отчёт не сформирован. Недостаточно данных", data=output_str)
         result_status = "error"
         result_message = "No data matching the specified criteria was found."

@@ -1,6 +1,6 @@
 import math
 
-from datetime import time
+from datetime import time, datetime
 from modules import api
 from modules.utils import str_to_date, timezone_correction, log
 from modules.config_loader import TIME_FILTER, CLOUDINESS_FILTER, TIMEZONE_CORRECTION_AMOUNT
@@ -242,14 +242,29 @@ def get_clouds_data() -> dict:
     >>> get_clouds_data()
         {'date_time': [datetime.datetime(2025, 1, 9, 0, 0), datetime.datetime(2025, 1, 9, 1, 0)], 'cloudiness': [65, 32]}
     """
+    def outdated_data_filter(timestamp: list[datetime])->list[datetime]:
+        """
+        Фильтрует данные типа datetime, отбрасывая устаревшие данные
+
+        Returns:
+            list: Список из данных datetime, в котором все элементы равны или позднее текущего времени
+        """
+        filtered_data = []
+        for element in timestamp:
+            if element.date() == datetime.now().date() and element.time() <= datetime.now().time():
+                pass
+            else:
+                filtered_data.append(element)
+        return filtered_data
+
     data = api.fetch("/clouds-1h", {"windspeed":"kmh", "temperature":"C"})["data_1h"]
     timestamp = data["time"]
     cloudiness = data["totalcloudcover"]
     
     date_time = str_to_date(timestamp, "%Y-%m-%d %H:%M")
-
+    filtered_date_time = outdated_data_filter(date_time)
     return {
-        "date_time": date_time,
+        "date_time": filtered_date_time,
         "cloudiness": cloudiness,
         }
 
