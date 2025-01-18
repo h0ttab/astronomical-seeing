@@ -3,7 +3,7 @@ from modules.config_loader import CLOUDINESS_FILTER
 from modules.utils import log
 from jinja2 import Environment, FileSystemLoader
 
-env = Environment(loader=FileSystemLoader('./'))
+env = Environment(loader=FileSystemLoader('./resources'))
 template = env.get_template('report_template.j2')
 
 def compose_report(weather_data: dict) -> dict:
