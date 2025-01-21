@@ -64,29 +64,6 @@ def log_flush() -> None:
 
     print("Log file has been cleared")
 
-def str_to_date(timestamps: list[str], timestamp_format:str) -> list[datetime]:
-    """
-    Преобразует список строк с датой и временем в объекты datetime.
-
-    Args:
-        timestamps (list[str]): Список строковых представлений даты и времени.
-        timestamp_format (str): Шаблон для парсинга строки в объект datetime.
-            Пример: "%Y-%m-%d %H:%M:%S".
-
-    Returns:
-        list[datetime]: Список объектов datetime, преобразованных из строк.
-
-    Example:
-        >>> str_to_date(["2024-05-15 15:21:10", "2022-01-05 15:14:13"], "%Y-%m-%d %H:%M:%S")
-        [datetime.datetime(2024, 5, 15, 15, 21, 10), datetime.datetime(2022, 1, 5, 15, 14, 13)]
-    """
-    formatted_timestamps = []
-
-    for ts in timestamps:
-        formatted_timestamps.append(datetime.strptime(ts, timestamp_format))
-    
-    return formatted_timestamps
-
 def timezone_correction(timestamp: list[datetime], correction_amount: int = 3) -> list[datetime]:
     """
     Смещает время в полученном списке объектов datetime.datetime на заданое количество часов.

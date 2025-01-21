@@ -1,9 +1,8 @@
 import math
 
 from datetime import time, datetime
-from modules.data_providers import api
-from modules.service.utils import str_to_date, timezone_correction, log
-from modules.data_providers.config_loader import TIME_FILTER, CLOUDINESS_FILTER, TIMEZONE_CORRECTION_AMOUNT
+from modules.service.utils import log
+from modules.data_providers.config_loader import TIME_FILTER, CLOUDINESS_FILTER
 
 def moon_illumination(illumination_midday: list[float], phase_name: list[str]) -> list:
     """
@@ -234,23 +233,7 @@ def process_weather_data(clouds_data: dict, moon_data: dict) -> dict:
 
     return clouds_data
 
-def get_clouds_data() -> dict:
-    """
-    Запрашивает через API данные об облачности.
-    Запрашивает данные об облачности, а также парсит данные о дате и времени, 
-    и из строки (str) приводит их к типу данных datetime.
-
-    Returns:
-        dict: Словарь, который содержит в себе две пары ключ:значение - date_time и cloudiness, 
-            которые содержат в себе почасовые данные об облачности для всего запрошенного периода. 
-            Каждая запись в списке даты и времени относится к идентичной ей по порядку записи из 
-            списка с показателями облачности.
-
-    Example:
-    >>> get_clouds_data()
-        {'date_time': [datetime.datetime(2025, 1, 9, 0, 0), datetime.datetime(2025, 1, 9, 1, 0)], 'cloudiness': [65, 32]}
-    """
-    def outdated_data_filter(date_time: list[datetime], cloudiness: list[int]) -> list:
+def outdated_data_filter(date_time: list[datetime], cloudiness: list[int]) -> list:
         """
         Фильтрует данные время/облачность, убирая устаревшие данные
 
@@ -275,45 +258,7 @@ def get_clouds_data() -> dict:
             else:
                 filtered_date_time.append(dt)
                 filtered_cloudiness.append(cl)
-        return filtered_date_time, filtered_cloudiness
-
-    data = api.fetch("/clouds-1h", {"windspeed":"kmh", "temperature":"C"})["data_1h"]
-    timestamp = data["time"]
-
-    date_time = str_to_date(timestamp, "%Y-%m-%d %H:%M")
-    cloudiness = data["totalcloudcover"]
-
-    filtered_date_time, filtered_cloudiness = outdated_data_filter(date_time, cloudiness)
-
-    return {
+        return {
         "date_time": filtered_date_time,
         "cloudiness": filtered_cloudiness,
-        }
-
-def get_sun_moon_data() -> dict:
-    """
-    Запрашивает по API данные о заходе/восходе Солнца и Луны, вычисляет освещенность Луны в процентах.
-    Запрашивает подневной прогноз данных о Солнце и Луне, а также (при необходимости) корректирует время о заходе Солнца согласно заданному часовому поясу. Вычисляет освещенность Луны в процентах на время полуночи в конце каждого дня.
-
-    Returns:
-        dict: Словарь, содержащий 4 набора данных - date, sunset, moon_illumination, moon_phase_name. Каждому элементу списка соответствует элемент из других списком с тем же индексом.
-
-    Example:
-        >>> get_sun_moon_data()
-            {'date': [datetime.datetime(2025, 1, 9, 0, 0)], 'sunset': [datetime.datetime(1900, 1, 1, 16, 20)],'moon_illumination': [79.8], 'moon_phase_name': ['waxing gibbous']}
-    """
-    data = api.fetch("/sunmoon")["data_day"]
-
-    data["time"] = str_to_date(data["time"], "%Y-%m-%d")
-    data["sunset"] = str_to_date(data["sunset"], "%H:%M")
-    #Use when API return default timezone sunset instead of the timezone you requested
-    #data["sunset"] = timezone_correction(data["sunset"], TIMEZONE_CORRECTION_AMOUNT)
-
-    moon_illumination_percentage = moon_illumination(data["moonilluminatedfraction"], data["moonphasename"])
-
-    return {
-        "date": data["time"], 
-        "sunset": data["sunset"],
-        "moon_illumination": moon_illumination_percentage,
-        "moon_phase_name": data["moonphasename"]
         }
