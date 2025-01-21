@@ -1,7 +1,6 @@
-from modules.weather import get_clouds_data, get_sun_moon_data, process_weather_data
-from modules.report import compose_report
-from modules.config_loader import BOT_TOKEN, CHAT_ID
-import requests
+from modules.data_processing.weather import get_clouds_data, get_sun_moon_data, process_weather_data
+from modules.data_presentation.report import compose_report
+from modules.data_presentation import telegram
 
 def main():
     clouds_data = get_clouds_data()
@@ -15,9 +14,4 @@ if __name__ == "__main__":
     result = main()
     #Если успешно сформирован отчёт, отправляем его в бот
     if result["status"] == "success":
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": CHAT_ID,
-            "text": result["message"]
-        }
-        requests.get(url, payload)
+        telegram.bot_send_message(result["message"])

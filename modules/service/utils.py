@@ -1,7 +1,7 @@
 import uuid
 
 from datetime import datetime, timedelta
-from modules.config_loader import LOGS_PATH
+from modules.data_providers.config_loader import LOGS_PATH
 
 today_date = str(datetime.now().date())
 

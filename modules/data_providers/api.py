@@ -1,5 +1,5 @@
-from modules.utils import merge_dicts, log
-from modules.config_loader import FORECAST_DAYS, API_KEY, TIMEZONE, LATITUDE, LONGITUDE
+from modules.service.utils import log
+from modules.data_providers.config_loader import FORECAST_DAYS, API_KEY, TIMEZONE, LATITUDE, LONGITUDE
 
 import requests
 

@@ -1,9 +1,9 @@
 import math
 
 from datetime import time, datetime
-from modules import api
-from modules.utils import str_to_date, timezone_correction, log
-from modules.config_loader import TIME_FILTER, CLOUDINESS_FILTER, TIMEZONE_CORRECTION_AMOUNT
+from modules.data_providers import api
+from modules.service.utils import str_to_date, timezone_correction, log
+from modules.data_providers.config_loader import TIME_FILTER, CLOUDINESS_FILTER, TIMEZONE_CORRECTION_AMOUNT
 
 def moon_illumination(illumination_midday: list[float], phase_name: list[str]) -> list:
     """

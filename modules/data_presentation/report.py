@@ -1,6 +1,6 @@
 import datetime
-from modules.config_loader import CLOUDINESS_FILTER
-from modules.utils import log
+from modules.data_providers.config_loader import CLOUDINESS_FILTER
+from modules.service.utils import log
 from jinja2 import Environment, FileSystemLoader
 
 env = Environment(loader=FileSystemLoader('./resources'))
