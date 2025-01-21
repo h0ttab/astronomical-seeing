@@ -5,32 +5,6 @@ from modules.config_loader import LOGS_PATH
 
 today_date = str(datetime.now().date())
 
-def merge_dicts(*dicts: dict) -> dict:
-    """
-    Производит конкатенацию (слияние) словарей. Если передан только один словарь, возвращает его в исходном виде.
-
-    Args:
-        *dicts (dict): Словари для последующего слияния, переданные как набор аргументов.
-    
-    Returns:
-        dict: Cловарь, являющийся результатом слияния всех переданных в функцию словарей.
-    
-    Example:
-        >>> merge_dicts({"name":"Vasya", "age":22}, {"last_name":"Ivanov})
-        {"name":"Vasya", "age":22, "last_name":"Ivanov"}
-    """
-    merge_result = []
-
-    # Проходимся по каждому словарю, и прибавляем к общему результату список (list)
-    # из пар ключ-значение этого словаря.
-    for dictionary in dicts:
-        merge_result += list(dictionary.items())
-
-    # Преобразуем набор "слепленных" вместе списков в словарь.
-    merge_result = dict(merge_result)
-
-    return merge_result
-
 def log(event_type: str, message: str, data: any = None) -> None:
     """
     Записывает данные в лог-файл с указанием типа события и сообщения.

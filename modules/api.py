@@ -37,7 +37,7 @@ def fetch(endpoint: str, add_params: dict = {}) -> dict:
     """
 
     url = API_BASE_URL + endpoint.lstrip(" /")
-    params = merge_dicts(add_params, REQUEST_COMMON_PARAMS)
+    params = add_params | REQUEST_COMMON_PARAMS
     log(event_type="INFO", message=f"Отправка GET запроса на адрес {url}", data=f"Параметры запроса:\n{params}")
     data = requests.get(url, params).json()
     log(event_type="INFO", message="Получен ответ от API.", data=data)
