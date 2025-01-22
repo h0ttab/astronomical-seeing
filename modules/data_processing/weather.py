@@ -131,15 +131,15 @@ def filter_cloudiness_data(data: dict, sunset: time) -> dict:
         >>> filter_data_by_time({datetime.time(22,14) : 15, datetime.time(15,41) : 92}, datetime.time(18,0))
         {datetime.time(22, 14): 15}
     """
-    # Создаём копию исходного словаря
-    filtered_data = dict(data.items())
+    # Создаём пустой словарь, куда будем помещать отфилтьрованные данные
+    filtered_data = {}
 
-    # Перебираем все значения времени и облачности в исходном словаре, и удаляем из
-    # копии те пары, которые не попадают в заданный диапазон времени или макисмально
+    # Перебираем все значения времени и облачности в словаре, переносим
+    # в копию те пары, которые не попадают в заданный диапазон времени или макисмально
     # допустимный показатель облачности
     for date_time, cloudiness in zip(data.keys(), data.values()):
-        if not is_time_in_range(sunset, TIME_FILTER, date_time) or cloudiness > CLOUDINESS_FILTER:
-            del filtered_data[date_time]
+        if is_time_in_range(sunset, TIME_FILTER, date_time) or cloudiness > CLOUDINESS_FILTER:
+            filtered_data[date_time] = cloudiness
 
     return filtered_data
 
