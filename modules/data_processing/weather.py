@@ -137,9 +137,9 @@ def filter_cloudiness_data(data: dict, sunset: time) -> dict:
     # Перебираем все значения времени и облачности в исходном словаре, и удаляем из
     # копии те пары, которые не попадают в заданный диапазон времени или макисмально
     # допустимный показатель облачности
-    for dt, cl in zip(data.keys(), data.values()):
-        if not is_time_in_range(sunset, TIME_FILTER, dt) or cl > CLOUDINESS_FILTER:
-            del filtered_data[dt]
+    for date_time, cloudiness in zip(data.keys(), data.values()):
+        if not is_time_in_range(sunset, TIME_FILTER, date_time) or cloudiness > CLOUDINESS_FILTER:
+            del filtered_data[date_time]
 
     return filtered_data
 
