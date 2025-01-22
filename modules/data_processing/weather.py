@@ -252,12 +252,12 @@ def outdated_data_filter(date_time: list[datetime], cloudiness: list[int]) -> li
         filtered_date_time = []
         filtered_cloudiness = []
 
-        for dt, cl in zip(date_time, cloudiness):
-            if dt.date() == datetime.now().date() and dt.time() <= datetime.now().time():
+        for datetime, cloudiness in zip(date_time, cloudiness):
+            if datetime.date() == datetime.now().date() and datetime.time() <= datetime.now().time():
                 pass
             else:
-                filtered_date_time.append(dt)
-                filtered_cloudiness.append(cl)
+                filtered_date_time.append(datetime)
+                filtered_cloudiness.append(cloudiness)
         return {
         "date_time": filtered_date_time,
         "cloudiness": filtered_cloudiness,
