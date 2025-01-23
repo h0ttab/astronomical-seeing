@@ -2,3 +2,4 @@ python-dotenv
 PyYAML
 Requests
 Jinja2
+Schema
