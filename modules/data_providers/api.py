@@ -5,6 +5,7 @@ from modules.data_providers.config_loader import FORECAST_DAYS, API_KEY, TIMEZON
 from datetime import datetime
 
 import requests
+from requests.exceptions import RequestException
 
 #Базовый URL для API сервиса погоды
 API_BASE_URL = "http://my.meteoblue.com/packages/"
@@ -42,10 +43,13 @@ def fetch(endpoint: str, add_params: dict = {}) -> dict:
     url = API_BASE_URL + endpoint.lstrip(" /")
     params = add_params | REQUEST_COMMON_PARAMS
     log(event_type="INFO", message=f"Отправка GET запроса на адрес {url}", data=f"Параметры запроса:\n{params}")
-    data = requests.get(url, params).json()
-    log(event_type="INFO", message="Получен ответ от API.", data=data)
-
-    return data
+    try:
+        data = requests.get(url, params).json()
+        log(event_type="INFO", message="Получен ответ от API.", data=data)
+        return data
+    except RequestException as exception:
+        log(event_type="ERROR", message=f"При запросе к API возникла ошибка: {exception}")
+        raise exception
 
 def get_clouds_data() -> dict:
     """
