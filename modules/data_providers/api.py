@@ -41,15 +41,20 @@ def fetch(endpoint: str, add_params: dict = {}) -> dict:
     """
 
     url = API_BASE_URL + endpoint.lstrip(" /")
+    # Объединяем словари с обязательными и опциональными параметрами запроса при помощи оператора "|"
     params = add_params | REQUEST_COMMON_PARAMS
     log(event_type="INFO", message=f"Отправка GET запроса на адрес {url}", data=f"Параметры запроса:\n{params}")
     try:
         data = requests.get(url, params).json()
+        # Если API вернул ошибку, вызываем ошибку RequestException
+        if data.get("error") == True:
+            raise RequestException(data['error_message'])
         log(event_type="INFO", message="Получен ответ от API.", data=data)
         return data
-    except RequestException as exception:
-        log(event_type="ERROR", message=f"При запросе к API возникла ошибка: {exception}")
-        raise exception
+    # В случае иной ошибки (нет связи с API) - вызываем ошибку RequestException
+    except RequestException as error:
+        log(event_type="ERROR", message=f"При запросе данных с сервера произошла ошибка: {error}")
+        raise RequestException(f"При запросе данных с сервера произошла ошибка: {error}")
 
 def get_clouds_data() -> dict:
     """

@@ -8,13 +8,15 @@ def load_config(config_path='./debug/config.yml'):
         config = yaml.safe_load(file)
     return config
 
+# Загружаем конфиг
 try:
-    # Загружаем конфиг
     config = load_config()
-except FileNotFoundError as file_error:
-    raise file_error
+# Если не удалось загрузить файл конфигурации, вызываем ошибку FileNotFoundError
+except FileNotFoundError:
+    raise FileNotFoundError("Ошибка при загрузке файла конфигурации: файл не найден.")
     
 
+# Описание схемы конфига - какие ключи должны быть, какие типы данных они должны содержать, и т.д.
 config_schema = Schema({
     "FORECAST_DAYS": And(int,Or(lambda days_requested: 1 <= days_requested <= 10, error=f"Количество запрашиваемых дней для прогноза должно быть от 1 до 10.")),
     "TIMEZONE_CORRECTION_AMOUNT": int,
@@ -45,5 +47,6 @@ try:
     TIMEZONE = config["TIMEZONE"]
     LATITUDE = config["LATITUDE"]
     LONGITUDE = config["LONGITUDE"]
-except SchemaError as se:
-    raise se
+# Если конфиг не прошёл валидацию, вызываем ошибку SchemaError
+except SchemaError as error:
+    raise SchemaError(f"Ошибка при загрузке конфигурации: {error}")

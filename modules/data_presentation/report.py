@@ -31,13 +31,18 @@ def compose_report(weather_data: dict) -> dict:
     # Проверяем, есть ли данные для отчёта
     for day in weather_data.keys():
         if weather_data[day]["date_time"]:
+        # Если данные есть - устанавливаем флаг True
             is_data_present = True
     
     # Если есть, то формируем отчёт
     if is_data_present:
-        rendered_template = template.render(weather_data=weather_data, current_time=current_time, CLOUDINESS_FILTER=CLOUDINESS_FILTER)
-        log(event_type="INFO", message="Сформирован отчёт", data=rendered_template)
-        return {"status": "success", "message": rendered_template}
+        try:
+            rendered_template = template.render(weather_data=weather_data, current_time=current_time, CLOUDINESS_FILTER=CLOUDINESS_FILTER)
+            log(event_type="INFO", message="Сформирован отчёт", data=rendered_template)
+            return {"status": "success", "message": rendered_template}
+        # Если во время формирования отчёта произошла ошибка, вызываем TemplateException
+        except TemplateError as error:
+            raise TemplateError(f"При подстановке данных в шаблон произошла ошибка: {error}")
     
     # Если данных нет, то возвращаем статус с ошибкой
     else:
