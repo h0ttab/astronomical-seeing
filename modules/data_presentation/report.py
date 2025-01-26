@@ -1,10 +1,14 @@
 import datetime
 from modules.data_providers.config_loader import CLOUDINESS_FILTER
 from modules.service.utils import log
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, TemplateError
 
-env = Environment(loader=FileSystemLoader('./resources'))
-template = env.get_template('report_template.j2')
+try:
+    env = Environment(loader=FileSystemLoader('./resources'))
+    template = env.get_template('report_template.j2')
+except TemplateError as error:
+    log(event_type="ERROR", message=f"Ошибка при загрузке шаблона отчёта: {error}")
+    raise TemplateError
 
 def compose_report(weather_data: dict) -> dict:
     """
