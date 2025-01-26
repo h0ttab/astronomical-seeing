@@ -1,7 +1,6 @@
 import math
 
 from datetime import time, datetime
-from modules.service.utils import log
 from modules.data_providers.config_loader import TIME_FILTER, CLOUDINESS_FILTER
 
 def moon_illumination(illumination_midday: list[float], phase_name: list[str]) -> list:
@@ -228,8 +227,6 @@ def process_weather_data(clouds_data: dict, moon_data: dict) -> dict:
     for day in list(clouds_data.keys()):
         if not clouds_data[day]["date_time"]:
             clouds_data.pop(day)
-
-    log(event_type="INFO", message="Данные обработаны.", data=clouds_data)
 
     return clouds_data
 

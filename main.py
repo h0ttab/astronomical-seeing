@@ -5,7 +5,6 @@ try:
     from modules.data_presentation import report
     from modules.data_providers.api import get_clouds_data, get_sun_moon_data
     from modules.data_presentation import telegram
-    from modules.service.utils import log
 # Если при инициализации модулей произошла ошибка, выводим её в консоль и завершаем работу программы.
 except Exception as error:
     print(error)
@@ -31,7 +30,6 @@ if __name__ == "__main__":
     # Выводим её в консоль, по возможности отправляем в бот, и завершаем работу программы.
     except Exception:
         error_traceback = traceback.format_exc()
-        log(event_type="ERROR", message=f"Произошла ошибка: \n {error_traceback}")
         print(error_traceback)
         telegram.bot_send_message(f"Произошла ошибка: \n {error_traceback}")
         sys.exit(1)

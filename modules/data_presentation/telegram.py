@@ -1,5 +1,4 @@
 from modules.data_providers.config_loader import BOT_TOKEN, CHAT_ID
-from modules.service.utils import log
 import requests
 
 def bot_send_message(message: str) -> bool:
@@ -31,5 +30,4 @@ def bot_send_message(message: str) -> bool:
             raise requests.RequestException(response.json())
     # В случае иной ошибки (например, ошибка соединения) - вызываем ошибку
     except requests.RequestException as error:
-        log(event_type="ERROR", message=f"При отправке сообщения в Telegram произошла ошибка: {error}")
         raise requests.RequestException(f"При отправке сообщения в Telegram произошла ошибка: {error}")

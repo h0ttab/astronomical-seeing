@@ -1,4 +1,3 @@
-from modules.service.utils import log
 from modules.data_processing.weather import moon_illumination
 from modules.data_providers.config_loader import FORECAST_DAYS, API_KEY, TIMEZONE, LATITUDE, LONGITUDE
 
@@ -43,17 +42,14 @@ def fetch(endpoint: str, add_params: dict = {}) -> dict:
     url = API_BASE_URL + endpoint.lstrip(" /")
     # Объединяем словари с обязательными и опциональными параметрами запроса при помощи оператора "|"
     params = add_params | REQUEST_COMMON_PARAMS
-    log(event_type="INFO", message=f"Отправка GET запроса на адрес {url}", data=f"Параметры запроса:\n{params}")
     try:
         data = requests.get(url, params).json()
         # Если API вернул ошибку, вызываем ошибку RequestException
         if data.get("error") == True:
             raise RequestException(data['error_message'])
-        log(event_type="INFO", message="Получен ответ от API.", data=data)
         return data
     # В случае иной ошибки (нет связи с API) - вызываем ошибку RequestException
     except RequestException as error:
-        log(event_type="ERROR", message=f"При запросе данных с сервера произошла ошибка: {error}")
         raise RequestException(f"При запросе данных с сервера произошла ошибка: {error}")
 
 def get_clouds_data() -> dict:
@@ -99,8 +95,6 @@ def get_sun_moon_data() -> dict:
 
     data["time"] = [datetime.strptime(timestamp, "%Y-%m-%d") for timestamp in data["time"]]
     data["sunset"] = [datetime.strptime(timestamp, "%H:%M") for timestamp in data["sunset"]]
-    #Use when API return default timezone sunset instead of the timezone you requested
-    #data["sunset"] = timezone_correction(data["sunset"], TIMEZONE_CORRECTION_AMOUNT)
 
     moon_illumination_percentage = moon_illumination(data["moonilluminatedfraction"], data["moonphasename"])
 

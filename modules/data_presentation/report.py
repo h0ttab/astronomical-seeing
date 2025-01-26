@@ -1,13 +1,11 @@
 import datetime
 from modules.data_providers.config_loader import CLOUDINESS_FILTER
-from modules.service.utils import log
 from jinja2 import Environment, FileSystemLoader, TemplateError
 
 try:
     env = Environment(loader=FileSystemLoader('./resources'))
     template = env.get_template('report_template.j2')
 except TemplateError as error:
-    log(event_type="ERROR", message=f"Ошибка при загрузке шаблона отчёта: {error}")
     raise TemplateError
 
 def compose_report(weather_data: dict) -> dict:
@@ -38,7 +36,6 @@ def compose_report(weather_data: dict) -> dict:
     if is_data_present:
         try:
             rendered_template = template.render(weather_data=weather_data, current_time=current_time, CLOUDINESS_FILTER=CLOUDINESS_FILTER)
-            log(event_type="INFO", message="Сформирован отчёт", data=rendered_template)
             return {"status": "success", "message": rendered_template}
         # Если во время формирования отчёта произошла ошибка, вызываем TemplateException
         except TemplateError as error:
@@ -46,5 +43,4 @@ def compose_report(weather_data: dict) -> dict:
     
     # Если данных нет, то возвращаем статус с ошибкой
     else:
-        log(event_type="WARNING", message="Отчёт не сформирован. Недостаточно данных", data="")
         return {"status": "error", "message": "Отчёт не сформирован. Недостаточно данных"}
