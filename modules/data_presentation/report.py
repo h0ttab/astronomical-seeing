@@ -8,39 +8,39 @@ try:
 except TemplateError as error:
     raise TemplateError
 
+
 def compose_report(weather_data: dict) -> dict:
     """
-    Формирует текстовый отчёт на основе шаблона Jinja2
+    Generates a text report based on a Jinja2 template
 
-    Входные данные представляют собой предварительно обработанный словарь с данными о погоде, сгруппированными по дням.
-    В функции предусмотрена валидация на наличие данных в отчёте, чтобы избежать появление "пустых" дней.
+    The input data is a pre-processed dictionary with weather data grouped by day.
+    The function includes validation for data presence in the report to avoid empty days.
 
     Args:
-        weather_data (dict): Словарь с данными об облачности, времени захода Солнца, освещённости и фазе Луны
+        weather_data (dict): Dictionary with data on cloudiness, sunset time, moon illumination, and moon phase.
 
     Returns:
-        dict: Словарь со статусом формирования отчёта (error или success) и сообщением, которое в случае
-            успешного формирования отчёта содержит сам отчёт, или же с сообщением об ошибке, если
-            отчёт не был сформирован.
+        dict: Dictionary with the report generation status (error or success) and a message containing the report itself if successful, or an error message if the report was not generated.
     """
     current_time = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
     is_data_present = False
 
-    # Проверяем, есть ли данные для отчёта
+    # Check if there is data for the report
     for day in weather_data.keys():
         if weather_data[day]["date_time"]:
-        # Если данные есть - устанавливаем флаг True
+            # If there is data, set the flag to True
             is_data_present = True
-    
-    # Если есть, то формируем отчёт
+
+    # If there is data, generate the report
     if is_data_present:
         try:
-            rendered_template = template.render(weather_data=weather_data, current_time=current_time, CLOUDINESS_FILTER=CLOUDINESS_FILTER)
+            rendered_template = template.render(weather_data=weather_data, current_time=current_time,
+                                                CLOUDINESS_FILTER=CLOUDINESS_FILTER)
             return {"status": "success", "message": rendered_template}
-        # Если во время формирования отчёта произошла ошибка, вызываем TemplateException
+        # If an error occurs during report generation, raise a TemplateError
         except TemplateError as error:
-            raise TemplateError(f"При подстановке данных в шаблон произошла ошибка: {error}")
-    
-    # Если данных нет, то возвращаем статус с ошибкой
+            raise TemplateError(f"An error occurred while rendering the template: {error}")
+
+    # If there is no data, return an error status
     else:
-        return {"status": "error", "message": "Отчёт не сформирован. Недостаточно данных"}
+        return {"status": "error", "message": "Report not generated. Insufficient data"}

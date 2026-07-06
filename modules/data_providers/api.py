@@ -6,70 +6,71 @@ from datetime import datetime
 import requests
 from requests.exceptions import RequestException
 
-#Базовый URL для API сервиса погоды
+# Base URL for the weather service API
 API_BASE_URL = "http://my.meteoblue.com/packages/"
 
-#Базовые (обязательные) параметры GET запроса, которые отправляются при каждом запросе к API.
+# Base (required) parameters for GET request sent with every API call.
 REQUEST_COMMON_PARAMS = {
-    "apikey" : API_KEY,
-    "tz" : TIMEZONE,
-    "forecast_days" : FORECAST_DAYS,
-    "format" : "json",
-    "lat" : LATITUDE,
-    "lon" : LONGITUDE,
+    "apikey": API_KEY,
+    "tz": TIMEZONE,
+    "forecast_days": FORECAST_DAYS,
+    "format": "json",
+    "lat": LATITUDE,
+    "lon": LONGITUDE,
 }
 
-def fetch(endpoint: str, add_params: dict = {}) -> dict:
+
+def fetch(endpoint: str, add_params=None) -> dict:
     """
-    Отправляет GET запрос к API и принимает данные.
-    
-    Запрашивает (GET) и принимает данные от API сервиса. Возвращает JSON-объект (словарь) с данными ответа от API.
+    Sends a GET request to the API and receives data.
+
+    Requests (GET) and receives data from the API service. Returns a JSON object (dictionary) with the API response data.
 
     Args:
-        endpoint (str): Конкретный эндпоинт API-сервиса, который подставляется в конец базового URL, 
-            заданного в качестве глобальной переменной API_BASE_URL
-        add_params (dict, optional): Дополнительный набор параметров GET запроса к сервису API. 
-            Добавляются к базовым параметрам, заданным в глобальной переменной REQUEST_COMMON_PARAMS.
+        endpoint (str): The specific API service endpoint, appended to the end of the base URL
+            defined as the global variable API_BASE_URL.
+        add_params (dict, optional): Additional set of GET request parameters for the API service.
+            Added to the base parameters defined in the global variable REQUEST_COMMON_PARAMS.
 
     Returns:
-        dict: Возвращает полученные данные в виде словаря (из JSON)
+        dict: Returns the received data as a dictionary (from JSON).
 
     Example:
-        >>> fetch("/api_service", {"city":"Moscow})
+        >>> fetch("/api_service", {"city":"Moscow"})
         {"response_code":200, "requested_city:"Moscow", "current_time":"21:30"}
     """
 
+    if add_params is None:
+        add_params = {}
     url = API_BASE_URL + endpoint.lstrip(" /")
-    # Объединяем словари с обязательными и опциональными параметрами запроса при помощи оператора "|"
+    # Merge dictionaries with required and optional request parameters using the "|" operator
     params = add_params | REQUEST_COMMON_PARAMS
     try:
         data = requests.get(url, params).json()
-        # Если API вернул ошибку, вызываем ошибку RequestException
+        # If the API returned an error, raise a RequestException
         if data.get("error") == True:
             raise RequestException(data['error_message'])
         return data
-    # В случае иной ошибки (нет связи с API) - вызываем ошибку RequestException
+    # In case of another error (no connection to API), raise a RequestException
     except RequestException as error:
-        raise RequestException(f"При запросе данных с сервера произошла ошибка: {error}")
+        raise RequestException(f"An error occurred while requesting data from the server: {error}")
+
 
 def get_clouds_data() -> dict:
     """
-    Запрашивает через API данные об облачности.
-    Запрашивает данные об облачности, а также парсит данные о дате и времени, 
-    и из строки (str) приводит их к типу данных datetime.
+    Requests cloudiness data via API.
+    Requests cloudiness data, parses the date and time data from strings (str) to datetime objects.
 
     Returns:
-        dict: Словарь, который содержит в себе две пары ключ:значение - date_time и cloudiness, 
-            которые содержат в себе почасовые данные об облачности для всего запрошенного периода. 
-            Каждая запись в списке даты и времени относится к идентичной ей по порядку записи из 
-            списка с показателями облачности.
+        dict: Dictionary containing two key-value pairs - date_time and cloudiness, containing hourly cloud cover data
+            for the entire requested period. Each entry in the date_time list corresponds to the cloudiness entry at the same index.
 
     Example:
     >>> get_clouds_data()
         {'date_time': [datetime.datetime(2025, 1, 9, 0, 0), datetime.datetime(2025, 1, 9, 1, 0)], 'cloudiness': [65, 32]}
     """
 
-    data = fetch("/clouds-1h", {"windspeed":"kmh", "temperature":"C"})["data_1h"]
+    data = fetch("/clouds-1h", {"windspeed": "kmh", "temperature": "C"})["data_1h"]
 
     date_time = [datetime.strptime(timestamp, "%Y-%m-%d %H:%M") for timestamp in data["time"]]
     cloudiness = data["totalcloudcover"]
@@ -77,15 +78,18 @@ def get_clouds_data() -> dict:
     return {
         "date_time": date_time,
         "cloudiness": cloudiness,
-        }
+    }
+
 
 def get_sun_moon_data() -> dict:
     """
-    Запрашивает по API данные о заходе/восходе Солнца и Луны, вычисляет освещенность Луны в процентах.
-    Запрашивает подневной прогноз данных о Солнце и Луне, а также (при необходимости) корректирует время о заходе Солнца согласно заданному часовому поясу. Вычисляет освещенность Луны в процентах на время полуночи в конце каждого дня.
+    Requests sunset/sunrise and moon data via API, calculates moon illumination percentage.
+    Requests daily sun and moon data, and (if necessary) adjusts sunset time according to the specified timezone.
+    Calculates moon illumination percentage at midnight at the end of each day.
 
     Returns:
-        dict: Словарь, содержащий 4 набора данных - date, sunset, moon_illumination, moon_phase_name. Каждому элементу списка соответствует элемент из других списком с тем же индексом.
+        dict: Dictionary containing 4 datasets - date, sunset, moon_illumination, moon_phase_name.
+            Each list element corresponds to elements in other lists at the same index.
 
     Example:
         >>> get_sun_moon_data()
@@ -99,8 +103,8 @@ def get_sun_moon_data() -> dict:
     moon_illumination_percentage = moon_illumination(data["moonilluminatedfraction"], data["moonphasename"])
 
     return {
-        "date": data["time"], 
+        "date": data["time"],
         "sunset": data["sunset"],
         "moon_illumination": moon_illumination_percentage,
         "moon_phase_name": data["moonphasename"]
-        }
+    }

@@ -1,0 +1,26 @@
+# Number of days (including the current date) for which the forecast will be requested
+FORECAST_DAYS: # 3
+
+# End point for the time-based data filtering range.
+TIME_FILTER: # "03:00"
+
+# Your timezone. You can find a list of timezones in the required format here - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+TIMEZONE: # "Time/Zone"
+
+# Geographic latitude of the location for which the forecast is requested
+LATITUDE: # 00.0000
+
+# Geographic longitude of the location for which the forecast is requested
+LONGITUDE: # 00.0000
+
+# Maximum acceptable cloud cover percentage (%)
+CLOUDINESS_FILTER: #20
+
+# API key for the weather service meteoblue.com
+API_KEY: # "KEY"
+
+# Your Telegram bot token
+BOT_TOKEN: # "TOKEN"
+
+# Your Telegram Chat ID
+CHAT_ID: # "CHAT ID"

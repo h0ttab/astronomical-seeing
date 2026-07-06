@@ -1,33 +1,29 @@
 from modules.data_providers.config_loader import BOT_TOKEN, CHAT_ID
 import requests
 
+
 def bot_send_message(message: str) -> bool:
     """
-    Отправляет сообщение через Telegram бот
+    Sends a message via Telegram bot
 
     Args:
-        message (str): Текстовое сообщение для отправки.
+        message (str): Text message to send.
 
     Returns:
-        bool: Статус отправки сообщения, полученный в ответ от Telegram API
-    
+        bool: Message sending status received from the Telegram API response
+
     Examples:
         >>> bot_send_message("Hello, friend!")
             True
     """
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-            "chat_id": CHAT_ID,
-            "text": message
-        }
+    payload = {"chat_id": CHAT_ID, "text": message}
     try:
-        response = requests.get(url, payload)
-        # Если Telegram API ответил статусом "ok": True, возвращаем True
-        if response.json()["ok"]:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        if response.json().get("ok"):
             return True
-        # Иначе, вызываем ошибку
         else:
-            raise requests.RequestException(response.json())
-    # В случае иной ошибки (например, ошибка соединения) - вызываем ошибку
+            raise requests.RequestException(response.text)
     except requests.RequestException as error:
-        raise requests.RequestException(f"При отправке сообщения в Telegram произошла ошибка: {error}")
+        raise requests.RequestException(f"An error occurred while sending a message to Telegram: {error}")
