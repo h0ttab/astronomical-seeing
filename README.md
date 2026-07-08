@@ -40,10 +40,7 @@ docker build -t astronomical-seeing .
 
 2. Run the container (mounting your local `config.yml` inside the container):
 ```bash
-docker run -d \
-  --name astronomical-seeing \
-  -v $(pwd)/config.yml:/app/config.yml \
-  astronomical-seeing
+docker run -d --name astronomical-seeing -v $(pwd)/config.yml:/app/config.yml astronomical-seeing
 ```
 
 ## 📂 Project Structure
